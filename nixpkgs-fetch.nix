@@ -5,7 +5,7 @@ in {
   pkgs = bootstrap_pkgs.fetchFromGitHub {
     owner = "NixOS";
     repo = "nixpkgs";
-    # Belong to the branch release-18.09
-    rev = "7e88992a8c7b2de0bcb89182d8686b27bd93e46a";
-    sha256 = "1f6lf4addczi81hchqbzjlhrsmkrj575dmdjdhyl0jkm7ypy2lgk";};
+    # Belong to the branch release-19.03
+    rev = "67bc63f9a7ac1b4d1a7114c88ca1a4df03bfdb0e";
+    sha256 = "0jzy9kd81dz1v0by3h0znz3z6bmpll3ssza5i5f14j2q54ib145g";};
   }

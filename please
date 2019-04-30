@@ -2,6 +2,10 @@
 
 INSTALL_DRV=""
 
+_list_attrs() {
+    nix-instantiate --strict --eval --expr "import ./get-attrs.nix {}" | tr -d "[]\""
+}
+
 _force_nixpkgs() {
     # without evaluating this all our queries will fail
     nix-build ./nixpkgs-fetch.nix >/dev/null
@@ -33,8 +37,13 @@ doctor() {
 }
 
 list() {
-    echo "Listing artifacts ..."
-    exit 0
+    local args="$*"
+
+    if [ -z "$args" ]; then
+        _list_attrs | tr " " "\n"
+    else
+        _list_attrs | tr " " "\n" | grep "$args"
+    fi
 }
 
 usage() {

@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-INSTALL_DRV=""
 
 _list_attrs() {
     nix-instantiate --strict --eval --expr "import ./get-attrs.nix {}" | tr -d "[]\""
@@ -32,8 +31,42 @@ init() {
 }
 
 doctor() {
-    echo "Running sanity checks ..."
-    exit 0
+    OK="\e[32m✓\e[0m"
+    FAIL=""
+    echo -e "Running sanity checks:\n"
+
+    nix --version >/dev/null
+    if [ "$?" -eq 0 ]; then
+        echo -e "- Nix installed :  $OK" 
+    else
+        echo -e "\nCannot execute Nix! Please follow the instructions in the README.md"
+        exit 1
+    fi
+
+
+    nix-channel --list | grep contrail >/dev/null
+    if [ "$?" -eq 0 ]; then
+        echo -e "- contrail channel configured: $OK"
+    else
+        echo "contrail channel not configured"
+        FAIL="."
+    fi
+    
+    
+    nix show-config | grep "cache.nix.corp.cloudwatt.com" >/dev/null
+    if [ "$?" -eq 0 ]; then 
+        echo -e "- contrail cache configured: $OK" 
+    else
+        echo "cache not configured"
+        FAIL="."
+    fi
+
+    if ! test -z "$FAIL"; then
+        exit 1
+    else
+        echo -e "\nAll tests passed 👍"
+    fi
+
 }
 
 list() {
@@ -53,6 +86,8 @@ usage() {
     echo " build [artifact]    -- build an artifact"
     echo " install [artifact]  -- install an artifact"
     echo " shell [artifact]    -- enter a dev shell for an artifact"
+    echo " test [test]         -- run a test"
+    echo " vm [test]           -- run an interactive vm of a test"
     echo " init                -- configure initial setup"
     echo " list                -- list artifacts"
     echo " doctor              -- perform sanity checks"

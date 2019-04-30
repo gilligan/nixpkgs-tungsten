@@ -1,23 +1,25 @@
 #!/usr/bin/env bash
 
+INSTALL_DRV=""
+
 _force_nixpkgs() {
     # without evaluating this all our queries will fail
     nix-build ./nixpkgs-fetch.nix >/dev/null
 }
 
 build() {
-    echo "Building $1 ..."
-    exit 0
+    local pkg="$1"
+    nix-build default.nix -A "$pkg"
 }
 
 install() {
-    echo "Installing $1 ..."
-    exit 0
+    local pkg="$1"
+    nix-env -f default.nix -iA "$pkg"
 }
 
 shell() {
-    echo "Opening development shell for $1 ..."
-    exit 0
+    local pkg="$1"
+    nix-shell default.nix -A "$pkg"
 }
 
 init() {
@@ -47,6 +49,8 @@ usage() {
     echo " doctor              -- perform sanity checks"
     echo  ""
 }
+
+_force_nixpkgs
 
 if [ -z "$1" ]; then
     usage

@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC1117
 
+log() {
+    local args="$*"
+    PLEASE="\e[32m[please]:\e[0m"
+    echo -e "$PLEASE $args"
+}
+
+log-run() {
+    local cmd="$1"
+    log "Running \"$cmd\"\n"
+    eval $cmd
+}
+
 
 _list_attrs() {
     nix-instantiate --strict --eval --expr "(import ./get-attrs.nix {}).all" | tr -d "[]\""
@@ -13,22 +25,22 @@ _force_nixpkgs() {
 
 build() {
     local pkg="$1"
-    nix-build default.nix -A "$pkg"
+    log-run "nix-build default.nix -A $pkg"
 }
 
 install() {
     local pkg="$1"
-    nix-env -f default.nix -iA "$pkg"
+    log-run "nix-env -f default.nix -iA $pkg"
 }
 
 shell() {
     local pkg="$1"
-    nix-shell default.nix -A "$pkg"
+    log-run "nix-shell default.nix -A $pkg"
 }
 
 test() {
     local t="$1"
-    nix-build default.nix -A "$t"
+    log-run "nix-build default.nix -A $t"
 }
 
 init() {
@@ -87,18 +99,18 @@ list() {
 
 run-test(){
     local t="$1"
-    nix-build default.nix -A "$t"
+    log-run "nix-build default.nix -A $t"
 }
 
 run-vm(){
     local t="$1"
-    nix-build default.nix -A "$t".driver
+    log-run "nix-build default.nix -A $t.driver"
     QEMU_NET_OPTS="hostfwd=tcp::8080-:8080,hostfwd=tcp::8143-:8143,hostfwd=tcp::2222-:22" result/bin/nixos-run-vms
 }
 
 usage() {
 cat <<EOM
-Usage: please <command> [args]"
+Usage: please <command> [args]
 
  build [artifact]    -- build an artifact
  doctor              -- perform sanity checks

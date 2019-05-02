@@ -51,7 +51,7 @@ init() {
 doctor() {
     OK="\e[32m✓\e[0m"
     FAIL=""
-    echo -e "Running sanity checks:\n"
+    log "Running sanity checks:\n"
 
     if nix --version >/dev/null
     then
@@ -79,12 +79,11 @@ doctor() {
         FAIL="."
     fi
 
-    if ! test -z "$FAIL"; then
-        exit 1
-    else
+    if [[ $FAIL = "" ]]; then
         echo -e "\nAll tests passed 👍"
+    else
+        exit 1
     fi
-
 }
 
 list() {

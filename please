@@ -2,7 +2,7 @@
 
 
 _list_attrs() {
-    nix-instantiate --strict --eval --expr "import ./get-attrs.nix {}" | tr -d "[]\""
+    nix-instantiate --strict --eval --expr "(import ./get-attrs.nix {}).all" | tr -d "[]\""
 }
 
 _force_nixpkgs() {
@@ -23,6 +23,11 @@ install() {
 shell() {
     local pkg="$1"
     nix-shell default.nix -A "$pkg"
+}
+
+test() {
+    local t="$1"
+    nix-build default.nix -A "$t"
 }
 
 init() {
@@ -79,6 +84,17 @@ list() {
     fi
 }
 
+run-test(){
+    local t="$1"
+    nix-build default.nix -A "$t"
+}
+
+run-vm(){
+    local t="$1"
+    nix-build default.nix -A "$t".driver
+    QEMU_NET_OPTS="hostfwd=tcp::8080-:8080,hostfwd=tcp::8143-:8143,hostfwd=tcp::2222-:22" result/bin/nixos-run-vms
+}
+
 usage() {
     echo ""
     echo "Usage: please <build|install|shell|init|list|doctor> [args]"
@@ -121,7 +137,17 @@ case "$subcommand" in
     list)
         list "$@"
         ;;
+    run-test)
+        run-test "$@"
+        ;;
+    run-vm)
+        run-vm "$@"
+        ;;
     doctor)
         doctor "$@"
         ;;
+    *)
+        echo "Error: unknown command: $subcommand"
+        usage
+        exit 1
 esac

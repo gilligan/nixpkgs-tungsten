@@ -97,18 +97,18 @@ run-vm(){
 }
 
 usage() {
-    echo ""
-    echo "Usage: please <build|install|shell|init|list|doctor> [args]"
-    echo ""
-    echo " build [artifact]    -- build an artifact"
-    echo " install [artifact]  -- install an artifact"
-    echo " shell [artifact]    -- enter a dev shell for an artifact"
-    echo " test [test]         -- run a test"
-    echo " vm [test]           -- run an interactive vm of a test"
-    echo " init                -- configure initial setup"
-    echo " list                -- list artifacts"
-    echo " doctor              -- perform sanity checks"
-    echo  ""
+cat <<EOM
+Usage: please <command> [args]"
+
+ build [artifact]    -- build an artifact
+ doctor              -- perform sanity checks
+ init                -- configure initial setup
+ install [artifact]  -- install an artifact
+ list                -- list artifacts
+ run-test [test]     -- run a test
+ run-vm [test]       -- run an interactive vm of a test
+ shell [artifact]    -- enter a dev shell for an artifact
+EOM
 }
 
 _force_nixpkgs

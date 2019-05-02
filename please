@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1117
 
 
 _list_attrs() {
@@ -40,8 +41,8 @@ doctor() {
     FAIL=""
     echo -e "Running sanity checks:\n"
 
-    nix --version >/dev/null
-    if [ "$?" -eq 0 ]; then
+    if nix --version >/dev/null
+    then
         echo -e "- Nix installed :  $OK" 
     else
         echo -e "\nCannot execute Nix! Please follow the instructions in the README.md"
@@ -49,8 +50,8 @@ doctor() {
     fi
 
 
-    nix-channel --list | grep contrail >/dev/null
-    if [ "$?" -eq 0 ]; then
+    if nix-channel --list | grep contrail >/dev/null
+    then
         echo -e "- contrail channel configured: $OK"
     else
         echo "contrail channel not configured"
@@ -58,8 +59,8 @@ doctor() {
     fi
     
     
-    nix show-config | grep "cache.nix.corp.cloudwatt.com" >/dev/null
-    if [ "$?" -eq 0 ]; then 
+    if nix show-config | grep "cache.nix.corp.cloudwatt.com" >/dev/null
+    then 
         echo -e "- contrail cache configured: $OK" 
     else
         echo "cache not configured"

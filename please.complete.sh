@@ -1,5 +1,3 @@
-set completion-display-width 0
-
 _get_attrs()
 {
     nix-instantiate --strict --eval --expr "(import ./get-attrs.nix {}).all" | tr -d "[]\""

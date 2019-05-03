@@ -23,6 +23,40 @@ _force_nixpkgs() {
     nix-build ./nixpkgs-fetch.nix >/dev/null
 }
 
+#
+# sanity check functions
+#
+
+_isChannelInstalled() {
+    nix-channel --list | grep contrail >/dev/null
+}
+
+_isSubstituterConfigured() {
+    nix show-config | grep "cache.nix.corp.cloudwatt.com" >/dev/null
+}
+
+_isNixInstalled() {
+    nix --version >/dev/null
+}
+
+_addCacheConfig() {
+    if test -f ~/.config/nix/nix.conf
+    then
+        log "$HOME/.config/nix/nix.conf exists. Please follow the instructions from the README"
+    else
+        mkdir -p "$HOME"/.config/nix/
+        cat << EOF > "$HOME"/.config/nix/nix.conf
+substituters = https://cache.nixos.org  https://cache.nix.corp.cloudwatt.com
+trusted-substituters = https://cache.nix.corp.cloudwatt.com
+trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= cache.nix.cloudwatt.com:ApPt6XtZeOQ3hNRTSBQx+m6rd8p04G0DQwz0bZfVPL8= 
+EOF
+    fi
+}
+
+#
+# subcommands
+#
+
 build() {
     local pkg="$1"
     log-run "nix-build default.nix -A $pkg"
@@ -38,14 +72,22 @@ shell() {
     log-run "nix-shell default.nix -A $pkg"
 }
 
-test() {
-    local t="$1"
-    log-run "nix-build default.nix -A $t"
-}
-
 init() {
-    echo "Initializing setup ..."
-    exit 0
+    log "Initializing setup ..."
+
+    if _isChannelInstalled; then
+        log "channel is already configured"
+    else
+        log "adding contrail channel"
+        log-run "nix-channel --add https://hydra.nix.corp.cloudwatt.com/jobset/nixpkgs-tungsten/trunk/channel/latest contrail"
+    fi
+
+    if _isSubstituterConfigured; then
+        log "cache is already configured"
+    else
+        log "adding contrail binary cache"
+        _addCacheConfig
+    fi
 }
 
 doctor() {
@@ -53,7 +95,7 @@ doctor() {
     FAIL=""
     log "Running sanity checks:\n"
 
-    if nix --version >/dev/null
+    if _isNixInstalled
     then
         echo -e "- Nix installed :  $OK" 
     else
@@ -61,8 +103,7 @@ doctor() {
         exit 1
     fi
 
-
-    if nix-channel --list | grep contrail >/dev/null
+    if _isChannelInstalled
     then
         echo -e "- contrail channel configured: $OK"
     else
@@ -70,8 +111,7 @@ doctor() {
         FAIL="."
     fi
     
-    
-    if nix show-config | grep "cache.nix.corp.cloudwatt.com" >/dev/null
+    if _isSubstituterConfigured
     then 
         echo -e "- contrail cache configured: $OK" 
     else
@@ -122,13 +162,13 @@ Usage: please <command> [args]
 EOM
 }
 
-_force_nixpkgs
 
 if [ -z "$1" ]; then
     usage
     exit 1
 fi
 
+_isChannelInstalled && _force_nixpkgs
 
 subcommand="$1"
 shift

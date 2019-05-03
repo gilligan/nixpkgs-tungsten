@@ -99,7 +99,10 @@ doctor() {
     then
         echo -e "- Nix installed :  $OK" 
     else
-        echo -e "\nCannot execute Nix! Please follow the instructions in the README.md"
+        echo -e "\nCannot execute Nix! Is it installed?"
+        echo -e "\n  curl https://nixos.org/nix/install | sh\n"
+        echo -e "Already installed? Make sure your shell is sourcing 'nix.sh':"
+        echo -e "\n  source $HOME/.nix-profile/etc/profile.d/nix.sh\n"
         exit 1
     fi
 

@@ -61,6 +61,11 @@ EOF
 build() {
     local pkg="$1"
     log-run "nix-build default.nix -A $pkg"
+
+    if [ $? -eq 0 ]; then
+        echo ""
+        log "Your build result is symlinked in ./result"
+    fi
 }
 
 install() {
@@ -163,7 +168,7 @@ Usage: please <command> [args]
  doctor              -- perform sanity checks
  init                -- configure initial setup
  install [artifact]  -- install an artifact
- list                -- list artifacts
+ list                -- list artifacts and tests
  run-test [test]     -- run a test
  run-vm [test]       -- run an interactive vm of a test
  shell [artifact]    -- enter a dev shell for an artifact

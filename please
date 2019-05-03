@@ -199,7 +199,7 @@ Usage: please <command> [args]
  run-vm [test]       -- run an interactive vm of a test
  shell [artifact]    -- enter a dev shell for an artifact
 
-In order to enable context-sensitive completions run:
+In order to enable context-sensitive completions (bash only!) run:
 
   $ source <(please completions)
 

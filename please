@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC1117
 
+
 log() {
     local args="$*"
     PLEASE="\e[32m[please]:\e[0m"
@@ -92,6 +93,7 @@ init() {
 
 doctor() {
     OK="\e[32m✓\e[0m"
+    X="\e[31m✗\e[0m"
     FAIL=""
     log "Running sanity checks:\n"
 
@@ -108,23 +110,26 @@ doctor() {
 
     if _isChannelInstalled
     then
-        echo -e "- contrail channel configured: $OK"
+        echo -e "- contrail channel: $OK"
     else
-        echo "contrail channel not configured"
+        echo -e "- contrail channel: $X"
         FAIL="."
     fi
     
     if _isSubstituterConfigured
     then 
-        echo -e "- contrail cache configured: $OK" 
+        echo -e "- contrail cache: $OK" 
     else
-        echo "cache not configured"
+        echo -e "- contrail cache: $X" 
         FAIL="."
     fi
 
     if [[ $FAIL = "" ]]; then
         echo -e "\nAll tests passed 👍"
     else
+        echo -e "\nSome tests failed. Try running the init command:\n"
+        echo -e "  ./please init\n"
+        echo -e "Refer to the nixpkgs-tungsten README.md or open an issue if you continue to experience problems."
         exit 1
     fi
 }

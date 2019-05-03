@@ -1,10 +1,19 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC1117
 
+GET_ATTRS=./scripts/get-attrs.nix
+BASH_COMPL_SCRIPT=./scripts/please.complete.bash.sh
+
 
 log() {
     local args="$*"
-    PLEASE="\e[32m[please]:\e[0m"
+    local PLEASE="\e[32m[please]:\e[0m"
+    echo -e "$PLEASE $args"
+}
+
+log-error() {
+    local args="$*"
+    local PLEASE="\e[31m[please]\e[0m"
     echo -e "$PLEASE $args"
 }
 
@@ -16,13 +25,14 @@ log-run() {
 
 
 _list_attrs() {
-    nix-instantiate --strict --eval --expr "(import ./get-attrs.nix {}).all" | tr -d "[]\""
+    nix-instantiate --strict --eval --expr "(import $GET_ATTRS {}).all" | tr -d "[]\""
 }
 
 _force_nixpkgs() {
     # without evaluating this all our queries will fail
     nix-build ./nixpkgs-fetch.nix >/dev/null
 }
+
 
 #
 # sanity check functions
@@ -54,9 +64,24 @@ EOF
     fi
 }
 
+check_args() {
+    local actual="$1"
+    local expected="$2"
+    local cmd="$3"
+
+    if [ "$actual" -ne "$expected" ]; then
+        log-error "'$cmd' requires $expected arguments but $actual were given"
+        exit 1
+    fi
+}
+
 #
 # subcommands
 #
+
+register-completions() {
+    cat "$BASH_COMPL_SCRIPT"
+}
 
 build() {
     local pkg="$1"
@@ -165,6 +190,7 @@ cat <<EOM
 Usage: please <command> [args]
 
  build [artifact]    -- build an artifact
+ completions         -- output completion script
  doctor              -- perform sanity checks
  init                -- configure initial setup
  install [artifact]  -- install an artifact
@@ -172,6 +198,12 @@ Usage: please <command> [args]
  run-test [test]     -- run a test
  run-vm [test]       -- run an interactive vm of a test
  shell [artifact]    -- enter a dev shell for an artifact
+
+In order to enable context-sensitive completions run:
+
+  $ source <(please completions)
+
+You should add this to your init scripts.
 EOM
 }
 
@@ -188,12 +220,15 @@ shift
 
 case "$subcommand" in
     build)
+        check_args $# 1 "build"
         build "$@"
         ;;
     install)
+        check_args $# 1 "install"
         install "$@"
         ;;
     shell)
+        check_args $# 1 "shell"
         shell "$@"
         ;;
     init)
@@ -203,13 +238,18 @@ case "$subcommand" in
         list "$@"
         ;;
     run-test)
+        check_args $# 1 "run-test"
         run-test "$@"
         ;;
     run-vm)
+        check_args $# 1 "run-vm"
         run-vm "$@"
         ;;
     doctor)
-        doctor "$@"
+        doctor
+        ;;
+    completions)
+        register-completions
         ;;
     *)
         echo "Error: unknown command: $subcommand"

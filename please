@@ -50,6 +50,11 @@ _isNixInstalled() {
     nix --version >/dev/null
 }
 
+_sourceNix() {
+    NIX_SH="$HOME/.nix-profile/etc/profile.d/nix.sh"
+    test -f "$NIX_SH" && source "$NIX_SH"
+}
+
 _addCacheConfig() {
     if test -f ~/.config/nix/nix.conf
     then
@@ -112,6 +117,7 @@ init() {
         log "Looks like nix is not installed yet"
         log "Running 'curl https://nixos.org/nix/install | sh'"
         curl https://nixos.org/nix/install | sh
+        _sourceNix
     fi
 
     if _isChannelInstalled; then

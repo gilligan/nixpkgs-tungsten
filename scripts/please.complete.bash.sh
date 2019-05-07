@@ -24,10 +24,7 @@ _please_completions()
         install|build|shell)
             COMPREPLY=($(compgen -W "$(_get_attrs)" "$cur"))
             ;;
-        run-test)
-            COMPREPLY=($(compgen -W "$(_get_tests)" "$cur"))
-            ;;
-        run-vm)
+        run-vm|run-test)
             COMPREPLY=($(compgen -W "$(_get_tests)" "$cur"))
             ;;
     esac

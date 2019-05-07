@@ -33,4 +33,4 @@ _please_completions()
     esac
 }
 
-complete -F _please_completions please
+complete -F _please_completions ./please

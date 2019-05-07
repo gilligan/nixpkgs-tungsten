@@ -227,7 +227,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-_isChannelInstalled && _force_nixpkgs
+_isNixInstalled && _force_nixpkgs
 
 subcommand="$1"
 shift

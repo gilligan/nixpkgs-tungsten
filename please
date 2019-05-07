@@ -136,8 +136,8 @@ init() {
 }
 
 doctor() {
-    OK="\e[32m✓\e[0m"
-    X="\e[31m✗\e[0m"
+    OK="\e[32mOK\e[0m"
+    X="\e[31mX\e[0m"
     FAIL=""
     log "Running sanity checks:\n"
 
@@ -145,11 +145,8 @@ doctor() {
     then
         echo -e "- Nix installed :  $OK" 
     else
-        echo -e "\nCannot execute Nix! Is it installed?"
-        echo -e "\n  curl https://nixos.org/nix/install | sh\n"
-        echo -e "Already installed? Make sure your shell is sourcing 'nix.sh':"
-        echo -e "\n  source $HOME/.nix-profile/etc/profile.d/nix.sh\n"
-        exit 1
+        echo -e "- Nix installed :  $X" 
+        FAIL="."
     fi
 
     if _isChannelInstalled
@@ -169,7 +166,7 @@ doctor() {
     fi
 
     if [[ $FAIL = "" ]]; then
-        echo -e "\nAll tests passed 👍"
+        echo -e "\nAll tests passed."
     else
         echo -e "\nSome tests failed. Try running the init command:\n"
         echo -e "  ./please init\n"

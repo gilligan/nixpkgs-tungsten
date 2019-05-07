@@ -106,6 +106,14 @@ shell() {
 init() {
     log "Initializing setup ..."
 
+    if _isNixInstalled ; then
+        log "Looks like nix is already installed"
+    else
+        log "Looks like nix is not installed yet"
+        log "Running 'curl https://nixos.org/nix/install | sh'"
+        curl https://nixos.org/nix/install | sh
+    fi
+
     if _isChannelInstalled; then
         log "channel is already configured"
     else

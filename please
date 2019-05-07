@@ -47,7 +47,7 @@ _isSubstituterConfigured() {
 }
 
 _isNixInstalled() {
-    nix --version >/dev/null
+    nix --version >/dev/null 2>&1
 }
 
 _sourceNix() {
